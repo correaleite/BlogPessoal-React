@@ -1,4 +1,59 @@
+import { useEffect ,useState, type ChangeEvent, type FormEvent } from "react"
+import { useNavigate } from "react-router-dom"
+import type Usuario from "../../models/usuario"
+import { cadastrarUsuario } from "../../services/Service"
+
 function Cadastro(){
+    const navigate = useNavigate()
+    const [isLoading, setLoading] = useState<boolean>(false)
+    const [confirmarSenha, setConfirmarSenha] = useState<string>("")
+    const [usuario, setUsuario] = useState<Usuario> ({
+        id:0,
+        nome:'',
+        usuario:'',
+        senha:'',
+        foto:''
+    })
+
+    useEffect(() => {
+        if(usuario.id !== 0){
+            retornar()
+        }
+    }, [usuario])
+
+    function retornar(){
+        navigate('/login')
+    }
+
+    function atualizarEstado(e: ChangeEvent<HTMLInputElement>){
+        setUsuario({
+            ...usuario, //Spread Operator --> ela clona o usuario
+            [e.target.name]: e.target.value
+        })
+    }
+
+    function handleConfirmarSenha(e: ChangeEvent<HTMLInputElement>){
+        setConfirmarSenha(e.target.value)
+    }
+
+    async function cadastrarNovoUsuario(e: FormEvent<HTMLFormElement>){
+        e.preventDefault()
+        if(confirmarSenha === usuario.senha && usuario.senha.length >=8){
+            setLoading(true)
+
+            try {
+                await cadastrarUsuario(`/usuarios/cadastrar`, usuario, setUsuario)
+                alert("Usuário cadastrado com sucesso!")
+            }catch(erro){
+                alert('Erro ao cadastrar o usuário')
+            }
+        }else{
+            alert('Dados do usuário inconsistentes! Vefique as informações do cadastro.')
+            setUsuario({...usuario, senha:''})
+            setConfirmarSenha('')
+        }
+    }
+
     return(
         <>
         <div className="grid grid-cols-1 lg:grid-cols-2 h-screen place-items-center font-bold">

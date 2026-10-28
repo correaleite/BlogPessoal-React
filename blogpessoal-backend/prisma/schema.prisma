@@ -1,0 +1,43 @@
+//Configuração do gerador do Prisma Client
+generator client {
+    provider = "prisma-client-js"
+}
+
+// Configuração da fonte de dados (utilizando o SQLite para simplificação)
+datasource db {
+    provider = "sqlite"
+    url = env("DATABASE_URL")
+}
+
+//Tabela de Usuários
+model User {
+    id Int @id @default(autoincrement())
+    nome String
+    usuario String @unique
+    senha String
+    foto String?
+    postagens Postagens[]
+}
+
+//Tabela de Temas
+model Tema {
+    id Int @id @default(autoincrement())
+    descricao String
+    postagens Postagens[]
+}
+
+//Tabela de Postagens
+model Postagens {
+    id Int @id @default(autoincrement())
+    titulo String
+    texto String
+    data DataTime @default(now())
+
+
+//Chaves estrangeiras e relacionamentos
+usuarioId Int?
+usuario User? @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+temaId Int? 
+tema Tema? @relation(fields: [temaId], references: [id], onDelete: Cascade)
+}
